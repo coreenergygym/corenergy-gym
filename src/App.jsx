@@ -1,3 +1,4 @@
+import ResetPassword from './pages/ResetPassword'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import PublicSite from './pages/PublicSite'
 import AdminSetup from './pages/AdminSetup'
@@ -21,6 +22,7 @@ export default function App() {
         {/* Auth */}
         <Route path="/admin/setup" element={<AdminSetup />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/reset-password" element={<ResetPassword />} />
 
         {/* Admin (protected) */}
         <Route
