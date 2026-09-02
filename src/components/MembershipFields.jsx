@@ -4,11 +4,12 @@ import { formatRupees } from '../lib/format'
 import { computeDue } from '../lib/status'
 
 const DURATION_OPTIONS = [
-  { label: '1 Month', days: 30 },
-  { label: '3 Months', days: 90 },
-  { label: '6 Months', days: 180 },
-  { label: '12 Months', days: 365 },
-  { label: 'Custom', days: null },
+  { label: '1 Month', days: 30, fee: 1000 },
+  { label: '3 Months', days: 90, fee: 3000 },
+  { label: '4 Months', days: 120, fee: 3500 },
+  { label: '6 Months', days: 180, fee: 5500 },
+  { label: '12 Months', days: 365, fee: 9000 },
+  { label: 'Custom', days: null, fee: null },
 ]
 
 const PLAN_SUGGESTIONS = ['General Fitness', 'Strength Training', 'Cardio', 'Personal Training', 'Group Classes']
@@ -22,10 +23,16 @@ export default function MembershipFields({ value, onChange, feeLabel = 'Membersh
   }
 
   function handleDurationChange(label) {
-    const opt = DURATION_OPTIONS.find((o) => o.label === label)
-    const days = opt?.days ?? value.durationDays
-    const newExpiry = days ? addDays(value.startDate, days) : value.expiryDate
-    set({ durationLabel: label, durationDays: days || value.durationDays, expiryDate: newExpiry })
+  const opt = DURATION_OPTIONS.find((o) => o.label === label)
+  const days = opt?.days ?? value.durationDays
+  const newExpiry = days ? addDays(value.startDate, days) : value.expiryDate
+
+  set({
+    durationLabel: label,
+    durationDays: days || value.durationDays,
+    expiryDate: newExpiry,
+    fee: opt?.fee ?? value.fee,
+  })
   }
 
   function handleCustomDays(days) {
