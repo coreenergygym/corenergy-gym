@@ -93,7 +93,69 @@ export default function MembersList() {
       setLoading(false)
     }
   }
+  async function handleDeleteMember(row) {
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently remove ${row.member.full_name}? This action cannot be undone.`
+    )
 
+    if (!confirmed) return
+
+    try {
+      const memberId = row.member.id
+      const photoPath = row.member.photo_path
+
+      // Get all memberships of this member
+      const { data: memberships, error: membershipsError } = await supabase
+        .from('memberships')
+        .select('id')
+        .eq('member_id', memberId)
+
+      if (membershipsError) throw membershipsError
+
+      const membershipIds = (memberships || []).map((m) => m.id)
+
+      // Delete payments first
+      if (membershipIds.length > 0) {
+        const { error: paymentsError } = await supabase
+          .from('payments')
+          .delete()
+          .in('membership_id', membershipIds)
+
+        if (paymentsError) throw paymentsError
+      }
+
+      // Delete memberships
+      const { error: deleteMembershipsError } = await supabase
+        .from('memberships')
+        .delete()
+        .eq('member_id', memberId)
+
+      if (deleteMembershipsError) throw deleteMembershipsError
+
+      // Delete member
+      const { error: deleteMemberError } = await supabase
+        .from('members')
+        .delete()
+        .eq('id', memberId)
+
+      if (deleteMemberError) throw deleteMemberError
+
+      // Delete member photo if available
+      if (photoPath) {
+        await supabase.storage
+          .from('member-photos')
+          .remove([photoPath])
+      }
+
+      // Refresh members list
+      await loadMembers()
+
+      alert(`${row.member.full_name} has been removed successfully.`)
+    } catch (err) {
+      console.error(err)
+      alert('Could not remove this member. Please try again.')
+    }
+  }
   const filtered = useMemo(() => {
     switch (filter) {
       case 'Active':
@@ -157,6 +219,7 @@ export default function MembersList() {
                 <th>Expiry</th>
                 <th>Status</th>
                 <th>Payment</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -180,6 +243,14 @@ export default function MembersList() {
                   <td>{r.membership ? formatDateDisplay(r.membership.expiry_date) : '—'}</td>
                   <td>{r.status ? <MembershipStatusPill status={r.status} /> : '—'}</td>
                   <td>{r.membership ? <PaymentStatusPill due={r.due} /> : '—'}</td>
+                  <td>
+  <button
+    className="btn btn-danger"
+    onClick={() => handleDeleteMember(r)}
+  >
+    🗑️ Remove
+  </button>
+</td>
                 </tr>
               ))}
             </tbody>
