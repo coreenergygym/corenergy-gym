@@ -209,7 +209,7 @@ export function defaultMembershipValue(startDate = todayISO()) {
     durationDays: 30,
     startDate,
     expiryDate: addDays(startDate, 30),
-    fee: '',
+    fee: 1000,
     amountPaid: '',
     paymentDate: todayISO(),
     method: '',
