@@ -12,7 +12,7 @@ import { formatRupees } from '../lib/format'
 const EMPTY_PERSONAL = {
   fullName: '',
   mobile: '',
-  altMobile: '',
+
   dateOfBirth: '',
   gender: '',
   address: '',
@@ -44,7 +44,7 @@ export default function AddMember() {
     if (!personal.fullName.trim()) e.fullName = 'Full name is required.'
     if (!personal.mobile.trim()) e.mobile = 'Mobile number is required.'
     else if (!isValidPhone(personal.mobile)) e.mobile = 'Enter a valid mobile number.'
-    if (personal.altMobile && !isValidPhone(personal.altMobile)) e.altMobile = 'Enter a valid mobile number.'
+    
     if (!membershipValue.plan.trim()) e.plan = 'Membership plan is required.'
     if (!membershipValue.fee && membershipValue.fee !== 0) e.fee = 'Membership fee is required.'
     if (membershipValue.expiryDate < membershipValue.startDate) e.expiryDate = 'Expiry date cannot be before start date.'
@@ -71,7 +71,7 @@ export default function AddMember() {
           member_code: memberCode,
           full_name: personal.fullName.trim(),
           mobile: personal.mobile.trim(),
-          alt_mobile: personal.altMobile.trim() || null,
+          
           date_of_birth: personal.dateOfBirth || null,
           gender: personal.gender || null,
           address: personal.address.trim() || null,
@@ -212,11 +212,7 @@ export default function AddMember() {
             {errors.mobile && <div className="field-error">{errors.mobile}</div>}
           </div>
 
-          <div className="field">
-            <label htmlFor="altMobile">Alternate Mobile (optional)</label>
-            <input id="altMobile" value={personal.altMobile} onChange={(e) => setField('altMobile', e.target.value)} />
-            {errors.altMobile && <div className="field-error">{errors.altMobile}</div>}
-          </div>
+        
 
           <div className="field">
             <label htmlFor="dob">Date of Birth</label>
